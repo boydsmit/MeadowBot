@@ -38,7 +38,7 @@ namespace BunniBot.Modules.Administration
                 }
                 else
                 {
-                    await context.Channel.SendMessageAsync("You are not allowed to kick an Administrator.");
+                    await context.Channel.SendMessageAsync("You are not allowed to ban an Administrator.");
                 }
             }
             else
