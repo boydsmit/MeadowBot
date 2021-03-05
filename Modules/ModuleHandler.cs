@@ -10,6 +10,14 @@ namespace BunniBot.Modules
 {
     public class ModuleHandler : ModuleBase<SocketCommandContext>
     {
+        [Command("help")]
+        [Alias("commands")]
+        public async Task Help()
+        {
+            var help = new Help();
+            await help.Main(Context);
+        }
+        
         [Command("ping")]
         [Alias("pong", "hello")]
         public async Task PingAsync()
