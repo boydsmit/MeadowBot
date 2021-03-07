@@ -41,6 +41,13 @@ namespace BunniBot.Modules
             var ban = new Ban();
             await ban.Main(Context, mentionedUser, reason);
         }
+
+        [Command("warn")]
+        public async Task Warn(SocketGuildUser mentionedUser, [Remainder] string reason)
+        {
+            var warn = new Warn();
+            await warn.AddWarn(Context, mentionedUser, reason);
+        }
         
     }
 }
