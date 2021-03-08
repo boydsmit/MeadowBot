@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DnsClient.Protocol;
 using MongoDB.Bson;
@@ -13,12 +14,18 @@ namespace BunniBot.Database
 
         public MongoDBHandler(string database)
         {
+            if (database.Contains(" "))
+            {
+                database = database.Replace(" ", "_");
+            }
+            
             var client = new MongoClient();
             db = client.GetDatabase(database);
         }
 
         public async Task Upsert<T>(string table, long id, T record)
         {
+            
             var collection = db.GetCollection<T>(table);
             
             var result = collection.ReplaceOne(
