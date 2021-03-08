@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using DnsClient.Protocol;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -18,6 +20,8 @@ namespace BunniBot.Database
         public async Task Upsert<T>(string table, long id, T record)
         {
             var collection = db.GetCollection<T>(table);
+            var filter = Builders<T>.Filter.Eq("_id", id);
+            
             var result = collection.ReplaceOne(
                 new BsonDocument("_id", id),
                 record,
@@ -27,9 +31,17 @@ namespace BunniBot.Database
         public T LoadRecordById<T>(string table, long id)
         {
             var collection = db.GetCollection<T>(table);
-            var filter = Builders<T>.Filter.Eq("_id", id);
+            try
+            {
+                var filter = Builders<T>.Filter.Eq("_id", id);
+                var foundItem = collection.Find(filter).First();
+                return foundItem;
 
-            return collection.Find(filter).First();
+            }
+            catch (Exception e)
+            {
+                return default;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using BunniBot.Modules.Administration;
 using BunniBot.Modules.Text;
@@ -47,6 +48,15 @@ namespace BunniBot.Modules
         {
             var warn = new Warn();
             await warn.AddWarn(Context, mentionedUser, reason);
+        }
+
+        [Command("warnings")]
+        [Alias("logs")]
+        public async Task GetWarnings(SocketGuildUser mentionedUser, int page = 1)
+        {
+            page = page <= 0 ? 1 : page;
+            var warn = new Warn();
+            await warn.GetWarnings(Context, mentionedUser, page - 1);
         }
         
     }

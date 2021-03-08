@@ -7,12 +7,15 @@ namespace BunniBot.Database.Models
     {
         [BsonId]
         public long UserId;
+
+        public string Username;
         
         public List<ActionsModel> Actions = new List<ActionsModel>();
 
-        public UserLogsModel(long userId, List<ActionsModel> actions)
+        public UserLogsModel(long userId, string username, List<ActionsModel> actions)
         {
             UserId = userId;
+            Username = username;
             Actions = actions;
         }
         
