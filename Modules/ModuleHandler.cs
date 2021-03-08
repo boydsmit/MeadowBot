@@ -40,7 +40,15 @@ namespace BunniBot.Modules
         public async Task Ban(SocketGuildUser mentionedUser, [Remainder] string reason = "No reason was given")
         {
             var ban = new Ban();
-            await ban.Main(Context, mentionedUser, reason);
+            await ban.AddBan(Context, mentionedUser, reason);
+        }
+
+        [Command("unban")]
+        [RequireBotPermission(GuildPermission.BanMembers)]
+        public async Task Unban(ulong userId)
+        {
+            var ban = new Ban();
+            await ban.RemoveBan(Context, userId);
         }
 
         [Command("warn")]
@@ -58,6 +66,5 @@ namespace BunniBot.Modules
             var warn = new Warn();
             await warn.GetWarnings(Context, mentionedUser, page - 1);
         }
-        
     }
 }

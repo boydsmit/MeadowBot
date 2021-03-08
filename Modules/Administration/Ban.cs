@@ -9,7 +9,7 @@ namespace BunniBot.Modules.Administration
 {
     public class Ban : ModuleBase<SocketCommandContext>
     {
-        public async Task  Main(SocketCommandContext context, IGuildUser mentionedUser, string reason)
+        public async Task  AddBan(SocketCommandContext context, IGuildUser mentionedUser, string reason)
         {
             var user = context.User as SocketGuildUser;
 
@@ -51,6 +51,30 @@ namespace BunniBot.Modules.Administration
             else
             {
                 await context.Channel.SendMessageAsync("You have insufficient permissions to perform this command.");
+            }
+        }
+
+        public async Task RemoveBan(SocketCommandContext context, ulong userId)
+        {
+            var user = context.User as SocketGuildUser;
+
+            if (user == null)
+            {
+                //todo: error handle
+                return;
+            }
+
+            if (user.GuildPermissions.BanMembers)
+            {
+                var ban = await context.Guild.GetBanAsync(userId);
+                
+                if (ban != null)
+                {
+                    await context.Guild.RemoveBanAsync(userId);
+                    await context.Channel.SendMessageAsync("User has been unbanned.");
+                    return;
+                }
+                await context.Channel.SendMessageAsync("User with id "  + userId + " is not banned.");
             }
         }
     }
