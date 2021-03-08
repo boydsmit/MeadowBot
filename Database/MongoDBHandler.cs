@@ -20,7 +20,6 @@ namespace BunniBot.Database
         public async Task Upsert<T>(string table, long id, T record)
         {
             var collection = db.GetCollection<T>(table);
-            var filter = Builders<T>.Filter.Eq("_id", id);
             
             var result = collection.ReplaceOne(
                 new BsonDocument("_id", id),
