@@ -29,7 +29,7 @@ namespace BunniBot.Modules
 
         [Command("kick")]
         [RequireBotPermission(GuildPermission.KickMembers)]
-        public async Task Kick(SocketGuildUser mentionedUser, string reason = null)
+        public async Task Kick(SocketGuildUser mentionedUser, [Remainder] string reason = null)
         {
             var kick = new Kick();
             await kick.Main(Context, mentionedUser, reason);

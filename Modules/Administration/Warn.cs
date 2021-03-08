@@ -67,11 +67,11 @@ namespace BunniBot.Modules.Administration
 
             for (var i = page * 5; i < page * 5 + 5; i++)
             {
-                if (actions[i] != null)
+                if (actions.Count > i) 
                 {
                     builder.AddField("Case: [" + i + "] - " + actions[i].GetActionType(), actions[i].GetReason());
+                    continue;
                 }
-
                 break;
             }
 

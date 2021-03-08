@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using BunniBot.Database;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -27,16 +29,22 @@ namespace BunniBot.Modules.Administration
                     builder.WithAuthor(user.Username, user.GetAvatarUrl());
                     builder.WithTitle("A user has been kicked!");
                     builder.WithColor(255, 183, 229); 
-                    builder.AddField("Kicked user", "`" + mentionedUser + "`", true);
+                    builder.AddField("Kicked user", mentionedUser, true);
                     builder.AddField( "\u200b", "\u200b", true);
-                    builder.AddField("Kicked user ID", "`" + mentionedUser.Id + "`", true);
+                    builder.AddField("Kicked user ID", mentionedUser.Id, true);
 
                     if (reason != null)
                     {
-                        builder.AddField("Reason", "`" + reason + "`"); 
+                        builder.AddField("Reason", reason);
                     }
                     
                     builder.WithCurrentTimestamp();
+                    
+                    var adminLogHandler = new AdminLogHandler();
+
+                    reason = reason ??  "No reason given";
+                    await adminLogHandler.AddLogAsync(context.Guild.Name,Convert.ToInt64(mentionedUser.Id), 
+                        mentionedUser.Username, "Kick", reason);
                     
                     await context.Channel.SendMessageAsync("", false, builder.Build());
                 }

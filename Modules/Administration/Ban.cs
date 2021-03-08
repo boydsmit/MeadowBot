@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using BunniBot.Database;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -28,12 +30,17 @@ namespace BunniBot.Modules.Administration
                     builder.WithAuthor(user.Username, user.GetAvatarUrl());
                     builder.WithTitle("A user has been Banned!");
                     builder.WithColor(255, 183, 229);
-                    builder.AddField("Banned user", "`" + mentionedUser + "`", true);
+                    builder.AddField("Banned user", mentionedUser, true);
                     builder.AddField( "\u200b", "\u200b", true);
-                    builder.AddField("Banned user ID", "`" + mentionedUser.Id + "`", true);
-                    builder.AddField("Reason", "`" + reason + "`");
+                    builder.AddField("Banned user ID", mentionedUser.Id, true);
+                    builder.AddField("Reason", reason);
                     builder.WithCurrentTimestamp();
                     
+                    var adminLogHandler = new AdminLogHandler();
+                    
+                    await adminLogHandler.AddLogAsync(context.Guild.Name,Convert.ToInt64(mentionedUser.Id), 
+                        mentionedUser.Username, "Ban", reason);
+
                     await context.Channel.SendMessageAsync("" , false, builder.Build());
                 }
                 else
