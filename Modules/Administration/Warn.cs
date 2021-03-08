@@ -12,10 +12,8 @@ namespace BunniBot.Modules.Administration
     {
         public async Task AddWarn(SocketCommandContext context, SocketGuildUser mentionedUser, string reason)
         {
-
             var user = context.User as SocketGuildUser;
-
-
+            
             if (user == null)
             {
                 //todo: error handle
@@ -25,9 +23,9 @@ namespace BunniBot.Modules.Administration
             if (user.GuildPermissions.MuteMembers)
             {
                 var adminLogHandler = new AdminLogHandler();
-                await adminLogHandler.AddLogAsync(Convert.ToInt64(mentionedUser.Id), mentionedUser.Username, "Warn",
-                    reason);
-                
+                await adminLogHandler.AddLogAsync(context.Guild.Name,Convert.ToInt64(mentionedUser.Id), 
+                    mentionedUser.Username, "Warn", reason);
+                    
                 var builder = new EmbedBuilder();
 
                 builder.WithAuthor(user.Username, user.GetAvatarUrl());
@@ -48,7 +46,7 @@ namespace BunniBot.Modules.Administration
 
         public async Task GetWarnings(SocketCommandContext context, SocketGuildUser mentionedUser, int page)
         {
-            var mongoDbHandler = new MongoDBHandler("UserLogs");
+            var mongoDbHandler = new MongoDBHandler(context.Guild.Name);
             var userLog = mongoDbHandler.LoadRecordById<UserLogsModel>("Logs", Convert.ToInt64(mentionedUser.Id));
 
             if (userLog == null)

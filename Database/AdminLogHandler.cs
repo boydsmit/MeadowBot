@@ -6,9 +6,9 @@ namespace BunniBot.Database
 {
     public class AdminLogHandler
     {
-        public async Task AddLogAsync(long id, string username, string type, string reason)
+        public async Task AddLogAsync(string dbName,long id, string username, string type, string reason)
         {
-            var mongoDbHandler = new MongoDBHandler("UserLogs");
+            var mongoDbHandler = new MongoDBHandler(dbName);
             var actionModel = new ActionsModel(type, reason);
             var currentEntry = mongoDbHandler.LoadRecordById<UserLogsModel>("Logs", id);
             var actions = new List<ActionsModel>();
