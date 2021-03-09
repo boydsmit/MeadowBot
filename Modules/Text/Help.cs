@@ -14,16 +14,23 @@ namespace BunniBot.Modules.Text
             builder.WithAuthor(context.Client.CurrentUser.Username, context.Client.CurrentUser.GetAvatarUrl());
             builder.WithTitle("All my commands:");
             builder.WithColor(255, 183, 229);
-            
-            builder.AddField("Text",
-                "```" + Environment.NewLine +
-                "!Help" +  Environment.NewLine +
-                "!Ping```");
+
+            builder.AddField("Interactions",
+                "!Hug" + Environment.NewLine +
+                "!Kiss" + Environment.NewLine +
+                "!Pat" + Environment.NewLine +
+                "!Slap"); 
             
             builder.AddField("Administration",
-                "```" + Environment.NewLine +
                 "!Ban" + Environment.NewLine +
-                "!Kick```");
+                "!Kick" + Environment.NewLine +  
+                "!Warn" + Environment.NewLine + 
+                "!Unban" + Environment.NewLine + 
+                "!Warnings");
+            
+            builder.AddField("Text",
+                "!Help" +  Environment.NewLine +
+                "!Ping");
             
             builder.WithFooter("Execute by using '!'   ex:'!help'");
             await context.Channel.SendMessageAsync("", false, builder.Build());
