@@ -10,7 +10,7 @@ namespace BunniBot.Database
         {
             var mongoDbHandler = new MongoDBHandler(dbName);
             var actionModel = new ActionsModel(type, reason);
-            var currentEntry = mongoDbHandler.LoadRecordById<UserLogsModel>("Logs", id);
+            var currentEntry = mongoDbHandler.LoadRecordByField<UserLogsModel>("Logs","_id", id);
             var actions = new List<ActionsModel>();
             
             if (currentEntry != null)

@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using BunniBot.Modules.Administration;
+using BunniBot.Modules.Media;
 using BunniBot.Modules.Text;
 using Discord;
 using Discord.Commands;
@@ -65,6 +66,37 @@ namespace BunniBot.Modules
             page = page <= 0 ? 1 : page;
             var warn = new Warn();
             await warn.GetWarnings(Context, mentionedUser, page - 1);
+        }
+
+        [Command("hug")]
+        public async Task Hug(SocketGuildUser mentionedUser)
+        {
+            var interactions = new Interactions();
+            await interactions.PostInteraction(Context, "hug", mentionedUser, "got hugged by");
+        }
+        
+        [Command("pat")]
+        public async Task Pat(SocketGuildUser mentionedUser)
+        {
+            var interactions = new Interactions();
+            await interactions.PostInteraction(Context, "pat", mentionedUser, "got a pat from");
+        }
+        
+        [Command("kiss")]
+        [Alias("smooch")]
+        public async Task Kiss(SocketGuildUser mentionedUser)
+        {
+            var interactions = new Interactions();
+            await interactions.PostInteraction(Context, "kiss", mentionedUser, "got a kiss from");
+        }
+        
+        
+        [Command("slap")]
+        [Alias("hit")]
+        public async Task Slap(SocketGuildUser mentionedUser)
+        {
+            var interactions = new Interactions();
+            await interactions.PostInteraction(Context, "slap", mentionedUser, "got slapped by");
         }
     }
 }

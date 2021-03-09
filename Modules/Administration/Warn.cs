@@ -13,7 +13,7 @@ namespace BunniBot.Modules.Administration
         public async Task AddWarn(SocketCommandContext context, SocketGuildUser mentionedUser, string reason)
         {
             var user = context.User as SocketGuildUser;
-            
+
             if (user == null)
             {
                 //todo: error handle
@@ -23,9 +23,9 @@ namespace BunniBot.Modules.Administration
             if (user.GuildPermissions.MuteMembers)
             {
                 var adminLogHandler = new AdminLogHandler();
-                await adminLogHandler.AddLogAsync(context.Guild.Name,Convert.ToInt64(mentionedUser.Id), 
+                await adminLogHandler.AddLogAsync(context.Guild.Name, Convert.ToInt64(mentionedUser.Id),
                     mentionedUser.Username, "Warn", reason);
-                    
+
                 var builder = new EmbedBuilder();
 
                 builder.WithAuthor(user.Username, user.GetAvatarUrl());
@@ -47,14 +47,16 @@ namespace BunniBot.Modules.Administration
         public async Task GetWarnings(SocketCommandContext context, SocketGuildUser mentionedUser, int page)
         {
             var mongoDbHandler = new MongoDBHandler(context.Guild.Name);
-            var userLog = mongoDbHandler.LoadRecordById<UserLogsModel>("Logs", Convert.ToInt64(mentionedUser.Id));
+            var userLog =
+                mongoDbHandler.LoadRecordByField<UserLogsModel>("Logs", "_id", Convert.ToInt64(mentionedUser.Id));
+
 
             if (userLog == null)
             {
                 await context.Channel.SendMessageAsync("This user has no logs!");
                 return;
             }
-            
+
             var builder = new EmbedBuilder();
 
             builder.WithAuthor(mentionedUser.Username, mentionedUser.GetAvatarUrl());
@@ -67,11 +69,12 @@ namespace BunniBot.Modules.Administration
 
             for (var i = page * 5; i < page * 5 + 5; i++)
             {
-                if (actions.Count > i) 
+                if (actions.Count > i)
                 {
                     builder.AddField("Case: [" + i + "] - " + actions[i].GetActionType(), actions[i].GetReason());
                     continue;
                 }
+
                 break;
             }
 
