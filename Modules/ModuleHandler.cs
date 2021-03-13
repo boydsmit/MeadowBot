@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Sockets;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using BunniBot.Modules.Administration;
 using BunniBot.Modules.Media;
 using BunniBot.Modules.Text;
@@ -68,6 +66,20 @@ namespace BunniBot.Modules
             await warn.GetWarnings(Context, mentionedUser, page - 1);
         }
 
+        [Command("mute")]
+        public async Task Mute(SocketGuildUser mentionedUser, [Remainder] string reason)
+        {
+            var mute = new Mute();
+            await mute.AddMute(Context, mentionedUser, reason);
+        }
+
+        [Command("setmuterole")]
+        public async Task SetMuteRole(SocketRole role)
+        {
+            var mute = new Mute();
+            await mute.SetMuteRole(Context, role);
+        }
+
         [Command("hug")]
         public async Task Hug(SocketGuildUser mentionedUser)
         {
@@ -97,6 +109,19 @@ namespace BunniBot.Modules
         {
             var interactions = new Interactions();
             await interactions.PostInteraction(Context, "slap", mentionedUser, "got slapped by");
+        }
+
+        [Command("lick")]
+        public async Task Lick(SocketGuildUser mentionedUser)
+        {
+            var interactions = new Interactions();
+            await interactions.PostInteraction(Context, "lick", mentionedUser, "got licked by");
+        }        
+
+        [Command("d bump")]
+        public async Task BumpReactor()
+        {
+            await Context.Channel.SendMessageAsync("Don't forget to vote for our server too! https://top.gg/servers/696727476692451430/vote");
         }
     }
 }

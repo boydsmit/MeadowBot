@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BunniBot.Database.Models;
+using MongoDB.Bson;
 
 namespace BunniBot.Database
 {

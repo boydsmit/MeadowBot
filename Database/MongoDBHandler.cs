@@ -11,16 +11,11 @@ namespace BunniBot.Database
 
         public MongoDBHandler(string database)
         {
-            if (database.Contains(" "))
-            {
-                database = database.Replace(" ", "_");
-            }
-            
             var client = new MongoClient();
             db = client.GetDatabase(database);
         }
 
-        public async Task Upsert<T>(string table, long id, T record)
+        public async Task Upsert<T>(string table, BsonValue id, T record)
         {
             var collection = db.GetCollection<T>(table);
             
@@ -32,7 +27,7 @@ namespace BunniBot.Database
 
         public T LoadRecordByField<T>(string table, string fieldName, object fieldValue)
         {
-            var collection = db.GetCollection<T>(table);
+            var collection = db.GetCollection<T>(table);    
             try
             {
                 var filter = Builders<T>.Filter.Eq(fieldName, fieldValue);

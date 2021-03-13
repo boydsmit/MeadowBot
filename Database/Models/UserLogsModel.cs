@@ -18,7 +18,5 @@ namespace BunniBot.Database.Models
             Username = username;
             Actions = actions;
         }
-        
-        
     }
 }

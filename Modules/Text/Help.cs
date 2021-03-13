@@ -19,6 +19,7 @@ namespace BunniBot.Modules.Text
                 "!Hug" + Environment.NewLine +
                 "!Kiss" + Environment.NewLine +
                 "!Pat" + Environment.NewLine +
+                "!Lick" + Environment.NewLine +
                 "!Slap"); 
             
             builder.AddField("Administration",

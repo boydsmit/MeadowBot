@@ -43,7 +43,7 @@ namespace BunniBot.Modules.Administration
                     var adminLogHandler = new AdminLogHandler();
 
                     reason = reason ??  "No reason given";
-                    await adminLogHandler.AddLogAsync(context.Guild.Name,Convert.ToInt64(mentionedUser.Id), 
+                    await adminLogHandler.AddLogAsync(context.Guild.Id.ToString(),Convert.ToInt64(mentionedUser.Id), 
                         mentionedUser.Username, "Kick", reason);
                     
                     await context.Channel.SendMessageAsync("", false, builder.Build());
