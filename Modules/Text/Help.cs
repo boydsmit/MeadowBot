@@ -20,13 +20,15 @@ namespace BunniBot.Modules.Text
                 "!Kiss" + Environment.NewLine +
                 "!Pat" + Environment.NewLine +
                 "!Lick" + Environment.NewLine +
-                "!Slap"); 
-            
+                "!Slap");
+
             builder.AddField("Administration",
                 "!Ban" + Environment.NewLine +
-                "!Kick" + Environment.NewLine +  
-                "!Warn" + Environment.NewLine + 
-                "!Unban" + Environment.NewLine + 
+                "!Kick" + Environment.NewLine +
+                "!Warn" + Environment.NewLine +
+                "!Unban" + Environment.NewLine +
+                "!Mute" + Environment.NewLine +
+                "!Unmute" + Environment.NewLine +
                 "!Warnings");
             
             builder.AddField("Text",

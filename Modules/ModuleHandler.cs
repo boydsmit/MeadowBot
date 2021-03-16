@@ -67,10 +67,17 @@ namespace BunniBot.Modules
         }
 
         [Command("mute")]
-        public async Task Mute(SocketGuildUser mentionedUser, [Remainder] string reason)
+        public async Task Mute(SocketGuildUser mentionedUser, string mutePeriod,   [Remainder] string reason)
         {
             var mute = new Mute();
-            await mute.AddMute(Context, mentionedUser, reason);
+            await mute.AddMute(Context, mentionedUser, mutePeriod, reason);
+        }
+
+        [Command("unmute")]
+        public async Task Unmute(SocketGuildUser mentionedUser)
+        {
+            var mute = new Mute();
+            await mute.Unmute(Context, mentionedUser);
         }
 
         [Command("setmuterole")]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -18,7 +19,7 @@ namespace BunniBot.Database
         public async Task Upsert<T>(string table, BsonValue id, T record)
         {
             var collection = db.GetCollection<T>(table);
-            
+
             var result = collection.ReplaceOne(
                 new BsonDocument("_id", id),
                 record,
@@ -27,7 +28,7 @@ namespace BunniBot.Database
 
         public T LoadRecordByField<T>(string table, string fieldName, object fieldValue)
         {
-            var collection = db.GetCollection<T>(table);    
+            var collection = db.GetCollection<T>(table);
             try
             {
                 var filter = Builders<T>.Filter.Eq(fieldName, fieldValue);
@@ -35,11 +36,30 @@ namespace BunniBot.Database
                 return foundItem;
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e);
                 return default;
             }
+        }
+
+        public List<T> LoadAllRecordsWhereFieldExist<T>(string table, string fieldName)
+        {
+            var collection = db.GetCollection<T>(table);
+            try
+            {
+                var filter = Builders<T>.Filter.Exists(fieldName);
+                return collection.Find(filter).ToList();
+            }
+            catch (Exception)
+            {
+                return default;
+            }
+        }
+
+        public async Task DeleteDocumentByField<T>(string table, string fieldName, BsonValue fieldValue)
+        {
+            var collection = db.GetCollection<T>(table);
+            var result = collection.DeleteOneAsync(new BsonDocument(fieldName, fieldValue));
         }
     }
 }

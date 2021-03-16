@@ -28,18 +28,16 @@ namespace BunniBot
                 
                 await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
                 await client.StartAsync();
-
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
                 await client.SetGameAsync("!Help | BOOST BUNNIE!");
-
+                services.GetRequiredService<JobHandlingService>();
                 await Task.Delay(Timeout.Infinite);
             }
         }
-
+        
         private Task LogAsync(LogMessage log)
         {
             Console.WriteLine(log.ToString());
-
             return Task.CompletedTask;
         }
 
@@ -49,6 +47,7 @@ namespace BunniBot
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
+                .AddSingleton<JobHandlingService>()
                 .AddSingleton<HttpClient>()
                 .BuildServiceProvider();
         }
