@@ -10,6 +10,12 @@ namespace BunniBot.Modules.Administration
 {
     public class Warn : ModuleBase<SocketCommandContext>
     {
+        /// <summary>
+        /// Warns a user and adds a entry in the logs
+        /// </summary>
+        /// <param name="context">Gives the context needed to execute the command.</param>
+        /// <param name="mentionedUser">Gives the user that needs to be warned.</param>
+        /// <param name="reason">Gives a reason of why the user was warned.</param>
         public async Task AddWarn(SocketCommandContext context, SocketGuildUser mentionedUser, string reason)
         {
             var user = context.User as SocketGuildUser;
@@ -44,6 +50,12 @@ namespace BunniBot.Modules.Administration
             }
         }
 
+        /// <summary>
+        /// Gets the warnings of a certain user by page (maximum of 5 logs per page).
+        /// </summary>
+        /// <param name="context">Gives the context needed to execute the command.</param>
+        /// <param name="mentionedUser">Gives the user of whom the warnings need to be checked.</param>
+        /// <param name="page">Gives the page the user wants to view.</param>
         public async Task GetWarnings(SocketCommandContext context, SocketGuildUser mentionedUser, int page)
         {
             var mongoDbHandler = new MongoDBHandler(context.Guild.Id.ToString());
@@ -63,18 +75,21 @@ namespace BunniBot.Modules.Administration
             builder.WithColor(255, 183, 229);
 
             var actions = userLog.Actions;
+            
+            //Calculates the amount of possible pages
             var maxPages = Math.Ceiling(Convert.ToDouble(actions.Count) / 5) - 1;
 
-            page = page > maxPages ? (int) maxPages : page;
+            //Checks if the current given page is possible to reach
+            page = page > maxPages ? (int) maxPages : page; 
 
-            for (var i = page * 5; i < page * 5 + 5; i++)
+            //Loops the logs of the given pages
+            for (var i = page * 5; i < page * 5 + 5; i++) 
             {
                 if (actions.Count > i)
                 {
                     builder.AddField("Case: [" + i + "] - " + actions[i].GetActionType(), actions[i].GetReason());
                     continue;
                 }
-
                 break;
             }
 

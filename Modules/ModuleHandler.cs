@@ -15,7 +15,7 @@ namespace BunniBot.Modules
         public async Task Help()
         {
             var help = new Help();
-            await help.Main(Context);
+            await help.ShowHelp(Context);
         }
         
         [Command("ping")]
@@ -23,7 +23,7 @@ namespace BunniBot.Modules
         public async Task PingAsync()
         {
             var ping = new Ping();
-            await ping.Main(Context);
+            await ping.ShowPing(Context);
         }
 
         [Command("kick")]
@@ -31,7 +31,7 @@ namespace BunniBot.Modules
         public async Task Kick(SocketGuildUser mentionedUser, [Remainder] string reason = null)
         {
             var kick = new Kick();
-            await kick.Main(Context, mentionedUser, reason);
+            await kick.KickUser(Context, mentionedUser, reason);
         }
 
         [Command("ban")]

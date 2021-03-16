@@ -9,7 +9,13 @@ namespace BunniBot.Modules.Administration
 {
     public class Kick : ModuleBase<SocketCommandContext>
     {
-        public async Task Main(SocketCommandContext context, SocketGuildUser mentionedUser, string reason)
+        /// <summary>
+        /// Kicks a user from the server.
+        /// </summary>
+        /// <param name="context">Gives the needed context to execute the command.</param>
+        /// <param name="mentionedUser">Gives the user that needs to be kicked.</param>
+        /// <param name="reason">Gives a reason of why the user was kicked.</param>
+        public async Task KickUser(SocketCommandContext context, SocketGuildUser mentionedUser, string reason)
         {
             var user = context.User as SocketGuildUser;
             if (user == null)
@@ -41,8 +47,11 @@ namespace BunniBot.Modules.Administration
                     builder.WithCurrentTimestamp();
                     
                     var adminLogHandler = new AdminLogHandler();
-
+                    
+                    //If no reason was given set the reason to 'no reason given'
                     reason = reason ??  "No reason given";
+                    
+                    //Adds an entry in the logs
                     await adminLogHandler.AddLogAsync(context.Guild.Id.ToString(),Convert.ToInt64(mentionedUser.Id), 
                         mentionedUser.Username, "Kick", reason);
                     

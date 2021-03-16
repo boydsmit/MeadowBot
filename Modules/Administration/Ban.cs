@@ -9,6 +9,12 @@ namespace BunniBot.Modules.Administration
 {
     public class Ban : ModuleBase<SocketCommandContext>
     {
+        /// <summary>
+        /// Adds a user to the banned user list and removes them from the server.
+        /// </summary>
+        /// <param name="context">Gives the needed context of the executed command.</param>
+        /// <param name="mentionedUser">Gives the user that needs to be banned.</param>
+        /// <param name="reason">Gives a reason why the user has been banned.</param>
         public async Task  AddBan(SocketCommandContext context, IGuildUser mentionedUser, string reason)
         {
             var user = context.User as SocketGuildUser;
@@ -18,12 +24,11 @@ namespace BunniBot.Modules.Administration
                 //todo: error handle
                 return;
             }
-
+            
             if (user.GuildPermissions.BanMembers)
             {
                 if (!mentionedUser.GuildPermissions.Administrator)
                 {
-                  
                     await context.Guild.AddBanAsync(mentionedUser, 0, reason);
                     var builder = new EmbedBuilder();
                     
@@ -38,6 +43,7 @@ namespace BunniBot.Modules.Administration
                     
                     var adminLogHandler = new AdminLogHandler();
                     
+                    //Adds an entry in the logs
                     await adminLogHandler.AddLogAsync(context.Guild.Id.ToString(),Convert.ToInt64(mentionedUser.Id), 
                         mentionedUser.Username, "Ban", reason);
 
@@ -54,6 +60,11 @@ namespace BunniBot.Modules.Administration
             }
         }
 
+        /// <summary>
+        /// Removes a user from the banned user list.
+        /// </summary>
+        /// <param name="context">Gives the context needed to execute the command.</param>
+        /// <param name="userId">Gives the id of the user that needs to be unbanned.</param>
         public async Task RemoveBan(SocketCommandContext context, ulong userId)
         {
             var user = context.User as SocketGuildUser;

@@ -6,9 +6,13 @@ namespace BunniBot.Modules.Text
 { 
     internal class Ping : ModuleBase<SocketCommandContext>
     {
-        public async Task Main(SocketCommandContext context)
+        /// <summary>
+        /// Pong!
+        /// </summary>
+        /// <param name="context">Gives the context needed to execute the command.</param>
+        public async Task ShowPing(SocketCommandContext context)
         {
-            await context.Channel.SendMessageAsync("Ping!");
+            await context.Channel.SendMessageAsync("Pong!");
         }
             
     }

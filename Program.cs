@@ -16,7 +16,10 @@ namespace BunniBot
         {
              new Program().MainAsync().GetAwaiter().GetResult();
         } 
-
+        
+        /// <summary>
+        /// Initializes and logs in the discord bot
+        /// </summary>
         private async Task MainAsync()
         {
             using (var services = ConfigureServices())
@@ -35,12 +38,16 @@ namespace BunniBot
             }
         }
         
+        /// <summary>
+        /// Simple Log writer that displays the logs in the console window.
+        /// </summary>
+        /// <param name="log">Gives a log message.</param>
         private Task LogAsync(LogMessage log)
         {
             Console.WriteLine(log.ToString());
             return Task.CompletedTask;
         }
-
+        
         private ServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
