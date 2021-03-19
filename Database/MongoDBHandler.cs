@@ -56,6 +56,12 @@ namespace BunniBot.Database
             }
         }
 
+        public List<T> GetAllDocumentsFromTable<T>(string table)
+        {
+            var collection =  db.GetCollection<T>(table);
+            return collection.Find(new BsonDocument()).ToList();
+        }
+
         public async Task DeleteDocumentByField<T>(string table, string fieldName, BsonValue fieldValue)
         {
             var collection = db.GetCollection<T>(table);

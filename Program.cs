@@ -28,12 +28,12 @@ namespace BunniBot
 
                 client.Log += LogAsync;
                 services.GetRequiredService<CommandService>().Log += LogAsync;
+                services.GetRequiredService<JobHandlingService>();
                 
                 await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
                 await client.StartAsync();
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
                 await client.SetGameAsync("!Help | BOOST BUNNIE!");
-                services.GetRequiredService<JobHandlingService>();
                 await Task.Delay(Timeout.Infinite);
             }
         }

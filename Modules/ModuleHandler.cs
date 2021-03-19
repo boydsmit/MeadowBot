@@ -2,6 +2,7 @@
 using BunniBot.Modules.Administration;
 using BunniBot.Modules.Media;
 using BunniBot.Modules.Text;
+using BunniBot.Modules.UserProgression;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -129,6 +130,13 @@ namespace BunniBot.Modules
         public async Task BumpReactor()
         {
             await Context.Channel.SendMessageAsync("Don't forget to vote for our server too! https://top.gg/servers/696727476692451430/vote");
+        }
+
+        [Command("BuyRole")]
+        public async Task BuyRole(SocketRole role)
+        {
+            var currencyHandler = new CurrencyHandler();
+            await currencyHandler.BuyItem(Context, role);
         }
     }
 }

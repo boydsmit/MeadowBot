@@ -4,11 +4,11 @@ namespace BunniBot.Database.Models
 {
     public class ServerSettingsModel
     {
-        public BsonValue Id;
+        public string Id;
         public BsonValue Value;
         public BsonValue MetaData;
 
-        public ServerSettingsModel(BsonValue id, object value, object metaData = null)
+        public ServerSettingsModel(string id, object value, object metaData = null)
         {
             Id = id;
             Value = BsonValue.Create(value);
