@@ -20,7 +20,7 @@ namespace BunniBot.Database
         {
             var collection = db.GetCollection<T>(table);
 
-            var result = collection.ReplaceOne(
+            await collection.ReplaceOneAsync(
                 new BsonDocument("_id", id),
                 record,
                 new UpdateOptions {IsUpsert = true});
@@ -41,21 +41,7 @@ namespace BunniBot.Database
                 return default;
             }
         }
-
-        public List<T> LoadAllRecordsWhereFieldExist<T>(string table, string fieldName)
-        {
-            var collection = db.GetCollection<T>(table);
-            try
-            {
-                var filter = Builders<T>.Filter.Exists(fieldName);
-                return collection.Find(filter).ToList();
-            }
-            catch (Exception)
-            {
-                return default;
-            }
-        }
-
+        
         public List<T> GetAllDocumentsFromTable<T>(string table)
         {
             var collection =  db.GetCollection<T>(table);

@@ -32,7 +32,7 @@ namespace BunniBot.Modules.UserProgression
             {
                 currentUserData = new UserDataModel(_context.User.Id, _context.User.Username);
                 currentUserData.LastUserCurrencyUpdateTimeBinary = 0;
-                serverData.AddUserData(Convert.ToInt64(_context.User.Id), currentUserData);
+                serverData.SetUserData(_context.User.Id, currentUserData);
             }
 
 
@@ -57,7 +57,26 @@ namespace BunniBot.Modules.UserProgression
         
         public async Task BuyItem(SocketCommandContext  context, SocketRole role)
         {
-            //buy item
+            var user = context.User as SocketGuildUser;
+            
+            if (user == null)
+            {
+                //todo: error handle
+                return;
+            }
+            
+            var serverData = _serverDataCache[_context.Guild.Id];
+            var shopRole = serverData.GetShopRoleModel()[role.Id];
+
+            var currentUserData = serverData.GetUserDataModel()[user.Id];
+
+            if (currentUserData.UserCurrency > shopRole.RoleCost)
+            {
+                currentUserData.SubtractUserCurrency(shopRole.RoleCost);
+                await user.AddRoleAsync(context.Guild.GetRole(shopRole.GetRoleId()));
+                
+                //todo: notify user
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BunniBot.Database;
 using BunniBot.Database.Models;
+using BunniBot.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -19,8 +20,9 @@ namespace BunniBot.Modules.Administration
         /// <param name="mentionedUser">Gives the user that needs to be muted.</param>
         /// <param name="mutePeriod">Gives the time period of the mute.</param>
         /// <param name="reason">Gives the reason of why the user was muted.</param>
+        /// <param name="serverCache">Gives the servers Cache</param>>
         public async Task AddMute(SocketCommandContext context, SocketGuildUser mentionedUser, string mutePeriod,
-            string reason)
+            string reason, ServerDataManager serverCache)
         {
             var user = context.User as SocketGuildUser;
 
@@ -32,12 +34,9 @@ namespace BunniBot.Modules.Administration
 
             if (user.GuildPermissions.MuteMembers)
             {
-                var mongoDbHandler = new MongoDBHandler(context.Guild.Id.ToString());
-                var serverSettings =
-                    mongoDbHandler.LoadRecordByField<ServerSettingsModel>("ServerSettings", "_id", "mute_role");
-
-                if (serverSettings != null && serverSettings.Value != null)
+                try
                 {
+                    var serverSettings = serverCache.GetServerSettingsModel()["mute_role"];
                     var logHandler = new AdminLogHandler();
 
                     //Adds an entry in the logs
@@ -81,7 +80,7 @@ namespace BunniBot.Modules.Administration
                     userData.SetMuteData(muteData);
                     
                     //Gives the user a muted state in the database
-                    await mongoDbHandler.Upsert("UserData", userData.UserId, userData);
+                    serverCache.SetUserData(Convert.ToUInt64(userData.UserId), userData);
 
                     var builder = new EmbedBuilder();
 
@@ -95,7 +94,7 @@ namespace BunniBot.Modules.Administration
 
                     await context.Channel.SendMessageAsync("", false, builder.Build());
                 }
-                else //Database entry of ServerSettings did not contain a role to mute members
+                catch //Cache of ServerSettings did not contain a role to mute members
                 {
                     var guildRoles = context.Guild.Roles.ToList();
                     
@@ -104,8 +103,8 @@ namespace BunniBot.Modules.Administration
                     if (existingMuteRole != null && user.GuildPermissions.Administrator)
                     {
                         //Adds the role to the server settings and reruns the command
-                        await SetMuteRole(context, existingMuteRole);
-                        await AddMute(context, mentionedUser, mutePeriod, reason);
+                        await SetMuteRole(context, existingMuteRole, serverCache);
+                        await AddMute(context, mentionedUser, mutePeriod, reason, serverCache);
                     }
                     else //Server did not contain a mute role
                     {
@@ -125,7 +124,8 @@ namespace BunniBot.Modules.Administration
         /// </summary>
         /// <param name="context">Gives the context needed to execute the command.</param>
         /// <param name="role">Gives a discord role.</param>
-        public async Task SetMuteRole(SocketCommandContext context, SocketRole role)
+        /// <param name="serverCache">Gives the servers Cache</param>
+        public async Task SetMuteRole(SocketCommandContext context, SocketRole role, ServerDataManager serverCache)
         {
             var user = context.User as SocketGuildUser;
 
@@ -139,8 +139,7 @@ namespace BunniBot.Modules.Administration
             {
                 var roleName = new Dictionary<string, string> {{"role_name", role.Name}};
                 var serverSettings = new ServerSettingsModel("mute_role", Convert.ToInt64(role.Id), roleName);
-                var mongoDbHandler = new MongoDBHandler(context.Guild.Id.ToString());
-                await mongoDbHandler.Upsert("ServerSettings", serverSettings.GetId(), serverSettings);
+                serverCache.AddServerSettings(serverSettings.Id, serverSettings);
             }
             else
             {
@@ -153,7 +152,8 @@ namespace BunniBot.Modules.Administration
         /// </summary>
         /// <param name="context">Gives the context needed to execute the command.</param>
         /// <param name="unmuteUser">Gives the user that needs to be unmuted.</param>
-        public async Task Unmute(SocketCommandContext context, SocketGuildUser unmuteUser)
+        /// <param name="serverCache">Gives the servers Cache</param>
+        public async Task Unmute(SocketCommandContext context, SocketGuildUser unmuteUser,  ServerDataManager serverCache)
         {
             var user = context.User as SocketGuildUser;
 
@@ -162,12 +162,10 @@ namespace BunniBot.Modules.Administration
                 //todo: error handle
                 return;
             }
-
+            
             if (user.GuildPermissions.MuteMembers)
             {
-                var mongoDbHandler = new MongoDBHandler(context.Guild.Id.ToString());
-                var serverSettingsModel =
-                    mongoDbHandler.LoadRecordByField<ServerSettingsModel>("ServerSettings", "_id", "mute_role");
+                var serverSettingsModel = serverCache.GetServerSettingsModel()["mute_role"];
 
                 var roleId = Convert.ToUInt64(serverSettingsModel.GetValue());
                 if (unmuteUser.Roles.Any(role => role.Id == roleId))
@@ -181,11 +179,10 @@ namespace BunniBot.Modules.Administration
                     builder.AddField("Unmuted User", unmuteUser.Username, true);
                     builder.AddField("Unmuted User ID", unmuteUser.Id, true);
                     
-                    //Removes the muted state from the users database entry
-                    var mutedUser = mongoDbHandler.LoadRecordByField<UserDataModel>("UserData", "_id", unmuteUser.Id);
+                    //Removes the muted state from the users cache 
+                    var mutedUser = serverCache.GetUserDataModel()[unmuteUser.Id];
                     mutedUser.SetMuteData(null);
-                    await mongoDbHandler.Upsert("UserData", mutedUser.UserId, mutedUser);
-
+                    
                     await context.Channel.SendMessageAsync("", false, builder.Build());
                 }
                 else
@@ -203,22 +200,19 @@ namespace BunniBot.Modules.Administration
         /// Auto unmutes the a user if the mute timer has expired.
         /// </summary>
         /// <param name="guild">Gives the current guild that is being checked.</param>
-        public async Task AutoUnmute(IGuild guild)
+        /// <param name="serverCache">Gives the servers Cache</param>
+        public async Task AutoUnmute(IGuild guild, ServerDataManager serverCache)
         {
-            var mongoDbHandler = new MongoDBHandler(guild.Id.ToString());
-            var mutedUsersInfo =
-                mongoDbHandler.LoadAllRecordsWhereFieldExist<UserDataModel>("UserData", "MuteData");
-            
-            //Checks if the server has any muted users
-            if (mutedUsersInfo == null)
-            {
-                return;
-            }
-
-            var muteRole =
-                mongoDbHandler.LoadRecordByField<ServerSettingsModel>("ServerSettings", "_id", "mute_role");
-
-            //Loops through every muted user
+            var mutedUsersInfo = serverCache.GetUserDataModel().Values.Where(x => x.MuteData != null).ToList();
+           
+           if (mutedUsersInfo.Count <= 0)
+           {
+                 return;
+           }
+           
+           var muteRole = serverCache.GetServerSettingsModel()["mute_role"];
+           
+           //Loops through every muted user
             foreach (var mutedUser in mutedUsersInfo)
             {
                 var muteData = mutedUser.GetMuteData();
@@ -237,21 +231,19 @@ namespace BunniBot.Modules.Administration
                         {
                             await discordUser.RemoveRoleAsync(guild.GetRole(muteRoleId));
                             
-                            //Removes the muted state from the users database entry
+                            //Removes the muted state from the users cache
                             mutedUser.SetMuteData(null);
-                            await mongoDbHandler.Upsert("UserData", mutedUser.UserId, mutedUser);
                         }
                         else //User no longer has the muted role
                         {
                             //Removes the muted state from the users database entry
                             mutedUser.SetMuteData(null);
-                            await mongoDbHandler.Upsert("UserData", mutedUser.UserId, mutedUser);
                         }
                     }
                     else //User has left the server
                     {
                         //Entirely removes the users database entry since they left the server and didnt join back even though the timer expired
-                        await mongoDbHandler.DeleteDocumentByField<UserDataModel>("UserData", "_id", mutedUser.UserId);
+                        //todo : remove entry
                     }
                 }
             }

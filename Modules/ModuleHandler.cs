@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BunniBot.Modules.Administration;
 using BunniBot.Modules.Media;
 using BunniBot.Modules.Text;
 using BunniBot.Modules.UserProgression;
+using BunniBot.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -11,6 +13,13 @@ namespace BunniBot.Modules
 {
     public class ModuleHandler : ModuleBase<SocketCommandContext>
     {
+        private static Dictionary<ulong, ServerDataManager> _serverDataCache = new Dictionary<ulong, ServerDataManager>();
+
+        public void SetCache(ref Dictionary<ulong, ServerDataManager> serverDataCache)
+        {
+            _serverDataCache = serverDataCache;
+        }
+        
         [Command("help")]
         [Alias("commands")]
         public async Task Help()
@@ -71,21 +80,21 @@ namespace BunniBot.Modules
         public async Task Mute(SocketGuildUser mentionedUser, string mutePeriod,   [Remainder] string reason)
         {
             var mute = new Mute();
-            await mute.AddMute(Context, mentionedUser, mutePeriod, reason);
+            await mute.AddMute(Context, mentionedUser, mutePeriod, reason, _serverDataCache[Context.Guild.Id]);
         }
 
         [Command("unmute")]
         public async Task Unmute(SocketGuildUser mentionedUser)
         {
             var mute = new Mute();
-            await mute.Unmute(Context, mentionedUser);
+            await mute.Unmute(Context, mentionedUser, _serverDataCache[Context.Guild.Id]);
         }
 
         [Command("setmuterole")]
         public async Task SetMuteRole(SocketRole role)
         {
             var mute = new Mute();
-            await mute.SetMuteRole(Context, role);
+            await mute.SetMuteRole(Context, role, _serverDataCache[Context.Guild.Id]);
         }
 
         [Command("hug")]

@@ -1,7 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using BunniBot.Database.Models;
 
 namespace BunniBot.Services
@@ -9,7 +6,7 @@ namespace BunniBot.Services
     public class ServerDataManager
     {
         private ulong _id;
-
+    
         private Dictionary<ulong, UserDataModel> _userDataCache;
         private Dictionary<ulong, ShopRoleModel> _shopRoleCache;
         private Dictionary<string, ServerSettingsModel> _serverSettingsCache;
@@ -22,9 +19,9 @@ namespace BunniBot.Services
             _id = discordServerId;
         }
         
-        public void AddUserData(long userId, UserDataModel userDataModel)
+        public void SetUserData(ulong userId, UserDataModel userDataModel)
         {
-            _userDataCache.Add(Convert.ToUInt64(userId), userDataModel);
+            _userDataCache[userId] = userDataModel;
         }
 
         public Dictionary<ulong, UserDataModel> GetUserDataModel()
@@ -45,6 +42,11 @@ namespace BunniBot.Services
         public void AddServerSettings(string setting, ServerSettingsModel serverSettingsModel) 
         {
             _serverSettingsCache.Add(setting, serverSettingsModel);
+        }
+
+        public Dictionary<string, ServerSettingsModel> GetServerSettingsModel()
+        {
+            return _serverSettingsCache;
         }
     }
 }
