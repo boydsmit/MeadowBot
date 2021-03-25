@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using BunniBot.Database.Models;
 using BunniBot.Services;
 using Discord.Commands;
-using Discord.WebSocket;
 
 namespace BunniBot.Modules.UserProgression
 {
@@ -44,38 +42,12 @@ namespace BunniBot.Modules.UserProgression
             var allowedUpdateTimeAsBinary =  
                 currentUserData.LastUserCurrencyUpdateTimeBinary + fiveMinutesAsBinary;
 
-           
-            
             var currentTimeAsBinary = DateTime.UtcNow.ToBinary();
 
             if(allowedUpdateTimeAsBinary <= currentTimeAsBinary)
             {
                 currentUserData.AddUserCurrency(randomNumber);
                 currentUserData.SetLastCurrencyUpdateAsBinary(currentTimeAsBinary);
-            }
-        }
-        
-        public async Task BuyItem(SocketCommandContext  context, SocketRole role)
-        {
-            var user = context.User as SocketGuildUser;
-            
-            if (user == null)
-            {
-                //todo: error handle
-                return;
-            }
-            
-            var serverData = _serverDataCache[_context.Guild.Id];
-            var shopRole = serverData.GetShopRoleModel()[role.Id];
-
-            var currentUserData = serverData.GetUserDataModel()[user.Id];
-
-            if (currentUserData.UserCurrency > shopRole.RoleCost)
-            {
-                currentUserData.SubtractUserCurrency(shopRole.RoleCost);
-                await user.AddRoleAsync(context.Guild.GetRole(shopRole.GetRoleId()));
-                
-                //todo: notify user
             }
         }
     }

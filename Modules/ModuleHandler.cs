@@ -141,11 +141,40 @@ namespace BunniBot.Modules
             await Context.Channel.SendMessageAsync("Don't forget to vote for our server too! https://top.gg/servers/696727476692451430/vote");
         }
 
-        [Command("BuyRole")]
+        [Command("addshoprole")]
+        public async Task AddShopRole(SocketRole role, int cost, int level = 0)
+        {
+            var shopRoleHandler = new ShopRoleHandler();
+            shopRoleHandler.Initialize(_serverDataCache[Context.Guild.Id], Context);
+            
+            await shopRoleHandler.AddShopRole(role, cost, level);
+        }
+
+        [Command("buyrole")]
         public async Task BuyRole(SocketRole role)
         {
-            var currencyHandler = new CurrencyHandler();
-            await currencyHandler.BuyItem(Context, role);
+            var shopRoleHandler = new ShopRoleHandler();
+            shopRoleHandler.Initialize(_serverDataCache[Context.Guild.Id], Context);
+
+            await shopRoleHandler.BuyItem(role);
+        }
+
+        [Command("shoproleinfo")]
+        public async Task ShopRoleInfo(SocketRole role)
+        {
+            var shopRoleHandler = new ShopRoleHandler();
+            shopRoleHandler.Initialize(_serverDataCache[Context.Guild.Id], Context);
+            
+            await shopRoleHandler.GetShopRoleInfo(role);
+        }
+
+        [Command("shoproles")]
+        public async Task GetShopRoles()
+        {
+            var shopRoleHandler = new ShopRoleHandler();
+            shopRoleHandler.Initialize(_serverDataCache[Context.Guild.Id], Context);
+
+            await shopRoleHandler.GetAllShopRoles();
         }
     }
 }
