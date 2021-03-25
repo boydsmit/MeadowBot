@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BunniBot.Database.Models;
 using BunniBot.Services;
+using Discord;
 using Discord.Commands;
 
 namespace BunniBot.Modules.UserProgression
@@ -49,6 +51,21 @@ namespace BunniBot.Modules.UserProgression
                 currentUserData.AddUserCurrency(randomNumber);
                 currentUserData.SetLastCurrencyUpdateAsBinary(currentTimeAsBinary);
             }
+        }
+
+        public async Task ShowBalance()
+        {
+             var serverData =  _serverDataCache[_context.Guild.Id];
+             var userData = serverData.GetUserDataModel()[_context.User.Id];
+             
+             var builder = new EmbedBuilder();
+
+             builder.WithAuthor(_context.User.Username, _context.User.GetAvatarUrl());
+             builder.WithTitle("Balance");
+             builder.WithColor(255, 183, 229);
+             builder.WithDescription("You have a balance of **¥" + userData.GetUserCurrency() + "**");
+
+             await _context.Channel.SendMessageAsync("", false, builder.Build());
         }
     }
 }

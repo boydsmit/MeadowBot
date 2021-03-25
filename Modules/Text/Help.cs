@@ -33,12 +33,21 @@ namespace BunniBot.Modules.Text
                 "!Unban" + Environment.NewLine +
                 "!Mute" + Environment.NewLine +
                 "!Unmute" + Environment.NewLine +
-                "!Warnings");
+                "!Warnings" + Environment.NewLine +
+                "!Addshoprole");
+
+            builder.AddField("User Progression",
+                "!Balance");
+            
+            builder.AddField("Roles",
+                "!Shoproles" + Environment.NewLine +
+                "!Shoprole" + Environment.NewLine +
+                "!BuyRole");
             
             builder.AddField("Text",
                 "!Help" +  Environment.NewLine +
                 "!Ping");
-            
+
             builder.WithFooter("Execute by using '!'   ex:'!help'");
             await context.Channel.SendMessageAsync("", false, builder.Build());
         }

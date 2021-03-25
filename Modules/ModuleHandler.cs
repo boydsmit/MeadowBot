@@ -176,5 +176,15 @@ namespace BunniBot.Modules
 
             await shopRoleHandler.GetAllShopRoles();
         }
+
+        [Command("balance")]
+        [Alias("bal", "currency", "cur", "money")]
+        public async Task GetBal()
+        {
+            var currencyHandler = new CurrencyHandler();
+            currencyHandler.Initialize(Context, ref _serverDataCache);
+            
+            await currencyHandler.ShowBalance();
+        }
     }
 }
