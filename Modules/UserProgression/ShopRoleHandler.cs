@@ -10,13 +10,11 @@ using Discord.WebSocket;
 namespace BunniBot.Modules.UserProgression
 {
     public class ShopRoleHandler : ModuleBase<SocketCommandContext>
-    {
-        private ServerDataManager _serverDataCache;
+    { 
         private static SocketCommandContext _context;
 
-        public void Initialize(ServerDataManager serverDataCache, SocketCommandContext context)
+        public void Initialize(SocketCommandContext context)
         {
-            _serverDataCache = serverDataCache;
             _context = context;
         }
 
@@ -32,8 +30,9 @@ namespace BunniBot.Modules.UserProgression
 
             if (user.GuildPermissions.Administrator)
             {
+                var serverCache = ServerDataManager.GetServerDataByServerId(_context.Guild.Id);
                 var shopRole = new ShopRoleModel(role.Id, role.Name, cost, requiredLevel);
-                _serverDataCache.AddShopRole(role.Id, shopRole);
+                serverCache.AddShopRole(role.Id, shopRole);
 
                 var builder = new EmbedBuilder();
 
@@ -69,8 +68,9 @@ namespace BunniBot.Modules.UserProgression
 
             try
             {
-                var shopRole = _serverDataCache.GetShopRoleModel()[role.Id];
-                var currentUserData = _serverDataCache.GetUserDataModel()[user.Id];
+                var serverData = ServerDataManager.GetServerDataByServerId(_context.Guild.Id);
+                var shopRole = serverData.GetShopRoleModel()[role.Id];
+                var currentUserData = serverData.GetUserDataModel()[user.Id];
 
                 if (user.Roles.Any(x => x.Id == shopRole.GetRoleId()))
                 {
@@ -142,7 +142,8 @@ namespace BunniBot.Modules.UserProgression
 
             try
             {
-                var shopRole = _serverDataCache.GetShopRoleModel()[role.Id];
+                var serverCache = ServerDataManager.GetServerDataByServerId(_context.Guild.Id);
+                var shopRole = serverCache.GetShopRoleModel()[role.Id];
                 
                 var builder = new EmbedBuilder();
                 builder.WithAuthor(user.Username, user.GetAvatarUrl());
@@ -162,13 +163,14 @@ namespace BunniBot.Modules.UserProgression
         public async Task GetAllShopRoles()
         {
             var user = _context.User as SocketGuildUser;
+            var serverData = ServerDataManager.GetServerDataByServerId(_context.Guild.Id);
 
             if (user == null)
             {
                 return;
             }
             
-            var shopRoles = _serverDataCache.GetShopRoleModel();
+            var shopRoles = serverData.GetShopRoleModel();
             
             var builder = new EmbedBuilder();
             builder.WithAuthor(user.Username, user.GetAvatarUrl());

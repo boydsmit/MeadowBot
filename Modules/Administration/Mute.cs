@@ -20,10 +20,10 @@ namespace BunniBot.Modules.Administration
         /// <param name="mentionedUser">Gives the user that needs to be muted.</param>
         /// <param name="mutePeriod">Gives the time period of the mute.</param>
         /// <param name="reason">Gives the reason of why the user was muted.</param>
-        /// <param name="serverCache">Gives the servers Cache</param>>
-        public async Task AddMute(SocketCommandContext context, SocketGuildUser mentionedUser, string mutePeriod,
-            string reason, ServerDataManager serverCache)
+        public async Task AddMute(SocketCommandContext context, SocketGuildUser mentionedUser, string mutePeriod, 
+            string reason)
         {
+            var serverCache = ServerDataManager.GetServerDataByServerId(context.Guild.Id);
             var user = context.User as SocketGuildUser;
 
             if (user == null)
@@ -103,8 +103,8 @@ namespace BunniBot.Modules.Administration
                     if (existingMuteRole != null && user.GuildPermissions.Administrator)
                     {
                         //Adds the role to the server settings and reruns the command
-                        await SetMuteRole(context, existingMuteRole, serverCache);
-                        await AddMute(context, mentionedUser, mutePeriod, reason, serverCache);
+                        await SetMuteRole(context, existingMuteRole);
+                        await AddMute(context, mentionedUser, mutePeriod, reason);
                     }
                     else //Server did not contain a mute role
                     {
@@ -124,9 +124,9 @@ namespace BunniBot.Modules.Administration
         /// </summary>
         /// <param name="context">Gives the context needed to execute the command.</param>
         /// <param name="role">Gives a discord role.</param>
-        /// <param name="serverCache">Gives the servers Cache</param>
-        public async Task SetMuteRole(SocketCommandContext context, SocketRole role, ServerDataManager serverCache)
+        public async Task SetMuteRole(SocketCommandContext context, SocketRole role)
         {
+            var serverCache = ServerDataManager.GetServerDataByServerId(context.Guild.Id);
             var user = context.User as SocketGuildUser;
 
             if (user == null)
@@ -152,9 +152,9 @@ namespace BunniBot.Modules.Administration
         /// </summary>
         /// <param name="context">Gives the context needed to execute the command.</param>
         /// <param name="unmuteUser">Gives the user that needs to be unmuted.</param>
-        /// <param name="serverCache">Gives the servers Cache</param>
-        public async Task Unmute(SocketCommandContext context, SocketGuildUser unmuteUser,  ServerDataManager serverCache)
+        public async Task Unmute(SocketCommandContext context, SocketGuildUser unmuteUser)
         {
+            var serverCache = ServerDataManager.GetServerDataByServerId(context.Guild.Id);
             var user = context.User as SocketGuildUser;
 
             if (user == null)
@@ -200,9 +200,9 @@ namespace BunniBot.Modules.Administration
         /// Auto unmutes the a user if the mute timer has expired.
         /// </summary>
         /// <param name="guild">Gives the current guild that is being checked.</param>
-        /// <param name="serverCache">Gives the servers Cache</param>
-        public async Task AutoUnmute(IGuild guild, ServerDataManager serverCache)
+        public async Task AutoUnmute(IGuild guild)
         {
+            var serverCache = ServerDataManager.GetServerDataByServerId(guild.Id);
             var mutedUsersInfo = serverCache.GetUserDataModel().Values.Where(x => x.MuteData != null).ToList();
            
            if (mutedUsersInfo.Count <= 0)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using BunniBot.Database.Models;
 using BunniBot.Services;
@@ -10,29 +9,20 @@ namespace BunniBot.Modules.UserProgression
 {
     public class CurrencyHandler : ModuleBase<SocketCommandContext>
     {
-        private SocketCommandContext _context;
-        private Dictionary<ulong,  ServerDataManager> _serverDataCache;
-        
-        public void Initialize(SocketCommandContext context, ref Dictionary<ulong, ServerDataManager> serverData)
+        public void MessageRecieved(SocketCommandContext context)
         {
-             _context = context;
-             _serverDataCache = serverData;
-        }
-        
-        public void MessageRecieved()
-        {
-            var serverData = _serverDataCache[_context.Guild.Id];
+            var serverData = ServerDataManager.GetServerDataByServerId(context.Guild.Id);
             UserDataModel currentUserData;
 
             try
             { 
-                currentUserData = serverData.GetUserDataModel()[_context.User.Id];
+                currentUserData = serverData.GetUserDataModel()[context.User.Id];
             }
             catch(Exception)
             {
-                currentUserData = new UserDataModel(_context.User.Id, _context.User.Username);
+                currentUserData = new UserDataModel(context.User.Id, context.User.Username);
                 currentUserData.LastUserCurrencyUpdateTimeBinary = 0;
-                serverData.SetUserData(_context.User.Id, currentUserData);
+                serverData.SetUserData(context.User.Id, currentUserData);
             }
 
 
@@ -53,19 +43,19 @@ namespace BunniBot.Modules.UserProgression
             }
         }
 
-        public async Task ShowBalance()
+        public async Task ShowBalance(SocketCommandContext context)
         {
-             var serverData =  _serverDataCache[_context.Guild.Id];
-             var userData = serverData.GetUserDataModel()[_context.User.Id];
+            var serverData = ServerDataManager.GetServerDataByServerId(context.Guild.Id);
+             var userData = serverData.GetUserDataModel()[context.User.Id];
              
              var builder = new EmbedBuilder();
 
-             builder.WithAuthor(_context.User.Username, _context.User.GetAvatarUrl());
+             builder.WithAuthor(context.User.Username, context.User.GetAvatarUrl());
              builder.WithTitle("Balance");
              builder.WithColor(255, 183, 229);
              builder.WithDescription("You have a balance of **¥" + userData.GetUserCurrency() + "**");
 
-             await _context.Channel.SendMessageAsync("", false, builder.Build());
+             await context.Channel.SendMessageAsync("", false, builder.Build());
         }
     }
 }

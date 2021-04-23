@@ -10,13 +10,31 @@ namespace BunniBot.Services
         private Dictionary<ulong, UserDataModel> _userDataCache;
         private Dictionary<ulong, ShopRoleModel> _shopRoleCache;
         private Dictionary<string, ServerSettingsModel> _serverSettingsCache;
+        private static readonly Dictionary<ulong, ServerDataManager> ServerDataManagers = new Dictionary<ulong, ServerDataManager>();
 
-        public ServerDataManager(ulong discordServerId)
+        private ServerDataManager(ulong discordServerId)
         {
             _userDataCache = new Dictionary<ulong, UserDataModel>();
             _shopRoleCache = new Dictionary<ulong, ShopRoleModel>();
             _serverSettingsCache = new Dictionary<string, ServerSettingsModel>();
             _id = discordServerId;
+        }
+        
+        public static ServerDataManager AddServer(ulong serverId)
+        {
+            var serverData = new ServerDataManager(serverId);
+            ServerDataManagers.Add(serverId, serverData);
+            return ServerDataManagers[serverId];
+        }
+
+        public static ServerDataManager GetServerDataByServerId(ulong serverId)
+        {
+            return ServerDataManagers[serverId];
+        }
+
+        public static Dictionary<ulong, ServerDataManager> GetAllServerData()
+        {
+            return ServerDataManagers;
         }
         
         public void SetUserData(ulong userId, UserDataModel userDataModel)

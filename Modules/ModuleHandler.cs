@@ -13,13 +13,6 @@ namespace BunniBot.Modules
 {
     public class ModuleHandler : ModuleBase<SocketCommandContext>
     {
-        private static Dictionary<ulong, ServerDataManager> _serverDataCache = new Dictionary<ulong, ServerDataManager>();
-
-        public void SetCache(ref Dictionary<ulong, ServerDataManager> serverDataCache)
-        {
-            _serverDataCache = serverDataCache;
-        }
-        
         [Command("help")]
         [Alias("commands")]
         public async Task Help()
@@ -80,21 +73,21 @@ namespace BunniBot.Modules
         public async Task Mute(SocketGuildUser mentionedUser, string mutePeriod,   [Remainder] string reason)
         {
             var mute = new Mute();
-            await mute.AddMute(Context, mentionedUser, mutePeriod, reason, _serverDataCache[Context.Guild.Id]);
+            await mute.AddMute(Context, mentionedUser, mutePeriod, reason);
         }
 
         [Command("unmute")]
         public async Task Unmute(SocketGuildUser mentionedUser)
         {
             var mute = new Mute();
-            await mute.Unmute(Context, mentionedUser, _serverDataCache[Context.Guild.Id]);
+            await mute.Unmute(Context, mentionedUser);
         }
 
         [Command("setmuterole")]
         public async Task SetMuteRole(SocketRole role)
         {
             var mute = new Mute();
-            await mute.SetMuteRole(Context, role, _serverDataCache[Context.Guild.Id]);
+            await mute.SetMuteRole(Context, role);
         }
 
         [Command("hug")]
@@ -145,7 +138,7 @@ namespace BunniBot.Modules
         public async Task AddShopRole(SocketRole role, int cost, int level = 0)
         {
             var shopRoleHandler = new ShopRoleHandler();
-            shopRoleHandler.Initialize(_serverDataCache[Context.Guild.Id], Context);
+            shopRoleHandler.Initialize(Context);
             
             await shopRoleHandler.AddShopRole(role, cost, level);
         }
@@ -154,7 +147,7 @@ namespace BunniBot.Modules
         public async Task BuyRole(SocketRole role)
         {
             var shopRoleHandler = new ShopRoleHandler();
-            shopRoleHandler.Initialize(_serverDataCache[Context.Guild.Id], Context);
+            shopRoleHandler.Initialize(Context);
 
             await shopRoleHandler.BuyItem(role);
         }
@@ -163,7 +156,7 @@ namespace BunniBot.Modules
         public async Task ShopRoleInfo(SocketRole role)
         {
             var shopRoleHandler = new ShopRoleHandler();
-            shopRoleHandler.Initialize(_serverDataCache[Context.Guild.Id], Context);
+            shopRoleHandler.Initialize(Context);
             
             await shopRoleHandler.GetShopRoleInfo(role);
         }
@@ -172,7 +165,7 @@ namespace BunniBot.Modules
         public async Task GetShopRoles()
         {
             var shopRoleHandler = new ShopRoleHandler();
-            shopRoleHandler.Initialize(_serverDataCache[Context.Guild.Id], Context);
+            shopRoleHandler.Initialize(Context);
 
             await shopRoleHandler.GetAllShopRoles();
         }
@@ -182,9 +175,7 @@ namespace BunniBot.Modules
         public async Task GetBal()
         {
             var currencyHandler = new CurrencyHandler();
-            currencyHandler.Initialize(Context, ref _serverDataCache);
-            
-            await currencyHandler.ShowBalance();
+            await currencyHandler.ShowBalance(Context);
         }
     }
 }

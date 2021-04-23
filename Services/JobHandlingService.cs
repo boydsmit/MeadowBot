@@ -17,9 +17,7 @@ namespace BunniBot.Services
     public class JobHandlingService
     {
         private readonly DiscordSocketClient _discord;
-        private static Dictionary<ulong, ServerDataManager> _serverDataCache = new Dictionary<ulong, ServerDataManager>();
-
-
+        
         public JobHandlingService(IServiceProvider service)
         {
             _discord = service.GetRequiredService<DiscordSocketClient>();
@@ -31,7 +29,6 @@ namespace BunniBot.Services
         {
             Task.Run(() => LoadCache()).ContinueWith(continuation => AutoJobRunner());
             var moduleHandler = new ModuleHandler();
-            moduleHandler.SetCache(ref _serverDataCache);
             return Task.CompletedTask;
         }
 
@@ -43,15 +40,14 @@ namespace BunniBot.Services
             var context = new SocketCommandContext(_discord, message);
             
             var currencyHandler = new CurrencyHandler();
-            currencyHandler.Initialize(context, ref _serverDataCache);
-            currencyHandler.MessageRecieved();
+            currencyHandler.MessageRecieved(context);
         }
         
         private Task LoadCache()
         {
             foreach (var guild in _discord.Guilds)
             {   
-                var serverDataManager = new ServerDataManager(guild.Id);
+                var serverDataManager = ServerDataManager.AddServer(guild.Id);
                 var database = new MongoDBHandler(guild.Id.ToString());
                 
                 var userDataList = database.GetAllDocumentsFromTable<UserDataModel>("UserData");
@@ -71,14 +67,13 @@ namespace BunniBot.Services
                 {
                     serverDataManager.AddServerSettings(serverSetting.Id, serverSetting);
                 }
-                _serverDataCache.Add(guild.Id, serverDataManager);
             }
             return Task.CompletedTask;
         }
 
         private async Task UpdateDataBaseWithCache()
         {
-            foreach (var cache in _serverDataCache)
+            foreach (var cache in ServerDataManager.GetAllServerData())
             {
                 var mongoDbHandler = new MongoDBHandler(cache.Key.ToString());
                 
@@ -107,7 +102,7 @@ namespace BunniBot.Services
                 foreach (var guild in _discord.Guilds)
                 {    
                     var mute = new Mute();
-                    await mute.AutoUnmute(guild, _serverDataCache[Convert.ToUInt64(guild.Id)]);
+                    await mute.AutoUnmute(guild);
                 }
                 await UpdateDataBaseWithCache();
                 
